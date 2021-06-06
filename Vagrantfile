@@ -1,4 +1,4 @@
-IMAGE_NAME = "ubuntu/focal64"
+IMAGE_NAME = "bento/ubuntu-20.04"
 K8S_NAME = "sjangra"
 MASTERS_NUM = 1
 MASTERS_CPU = 2
@@ -8,7 +8,7 @@ NODES_NUM = 1
 NODES_CPU = 2
 NODES_MEM = 4096
 
-IP_BASE = "192.168.1."
+IP_BASE = "192.168.10."
 K8S_POD_CIDR = "172.20.0.0/20"
 
 VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     (1..MASTERS_NUM).each do |i|
         config.vm.define "k8s-m-#{i}" do |master|
             master.vm.box = IMAGE_NAME
-            master.vm.network "public_network", adapter: "1", ip: "#{IP_BASE}#{i + 150}"
+            master.vm.network "private_network", ip: "#{IP_BASE}#{i + 10}"
             master.vm.hostname = "k8s-m-#{i}"
             master.vm.provider "virtualbox" do |v|
                 v.name = "k8s-m-#{i}"
@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
                     k8s_cluster_name: K8S_NAME,
                     k8s_master_admin_user:  "vagrant",
                     k8s_master_admin_group: "vagrant",
-                    k8s_master_apiserver_advertise_address: "#{IP_BASE}#{i + 150}",
+                    k8s_master_apiserver_advertise_address: "#{IP_BASE}#{i + 10}",
                     k8s_master_node_name: "k8s-m-#{i}",
                     k8s_node_public_ip: "#{IP_BASE}#{i + 10}",
                     k8s_master_pod_network_cidr: K8S_POD_CIDR
@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
     (1..NODES_NUM).each do |j|
         config.vm.define "k8s-n-#{j}" do |node|
             node.vm.box = IMAGE_NAME
-            node.vm.network "public_network", adapter: "1", ip: "#{IP_BASE}#{j + 160}"
+            node.vm.network "private_network", ip: "#{IP_BASE}#{j + 20}"
             node.vm.hostname = "k8s-n-#{j}"
             node.vm.provider "virtualbox" do |v|
                 v.name = "k8s-n-#{j}"
@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
                     k8s_cluster_name: K8S_NAME,
                     k8s_node_admin_user:  "vagrant",
                     k8s_node_admin_group: "vagrant",
-                    k8s_node_public_ip: "#{IP_BASE}#{j + 160}"
+                    k8s_node_public_ip: "#{IP_BASE}#{j + 20}"
                 }
             end
         end
