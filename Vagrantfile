@@ -1,6 +1,6 @@
 IMAGE_NAME = "bento/ubuntu-20.04"
 K8S_NAME = "sjangra"
-MASTERS_NUM = 3
+MASTERS_NUM = 1
 MASTERS_CPU = 2
 MASTERS_MEM = 4096
 
