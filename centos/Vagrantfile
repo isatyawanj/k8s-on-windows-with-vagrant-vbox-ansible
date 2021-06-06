@@ -1,0 +1,33 @@
+IMAGE_NAME = "centos/7"
+NUMBER_OF_VMS = 2
+CPU = 2
+MEM = 4096
+
+IP_BASE = "192.168.30."
+IP_START = 10
+
+VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+
+Vagrant.configure("2") do |config|
+  config.vm.box_check_update = false
+  config.ssh.insert_key = false
+  # below line is only needed if you want to push your own public key to all vms so that you can ssh into vm
+  config.vm.provision "file", source: "d:/vagrant/sjangra.pub", destination: "~/.ssh/sjangra_authorized_keys"
+  config.vm.provision "shell", inline: <<-SHELL
+      cat "/home/vagrant/.ssh/sjangra_authorized_keys" >> "/home/vagrant/.ssh/authorized_keys"
+  SHELL
+
+  (1..NUMBER_OF_VMS).each do |i|
+      config.vm.define "centos-0#{i}" do |node|
+        # Name shown in the GUI
+        node.vm.provider "virtualbox" do |vb|
+            vb.name = "centos-0#{i}"
+            vb.memory = MEM
+            vb.cpus = CPU
+        end
+        node.vm.box = IMAGE_NAME
+        node.vm.hostname = "centos-0#{i}"
+        node.vm.network "private_network", ip: IP_BASE + "#{IP_START + i}"
+      end
+  end
+end
