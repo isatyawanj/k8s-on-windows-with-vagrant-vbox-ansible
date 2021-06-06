@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
     (1..MASTERS_NUM).each do |i|
         config.vm.define "k8s-m-#{i}" do |master|
             master.vm.box = IMAGE_NAME
-            master.vm.network "public_network", ip: "#{IP_BASE}#{i + 10}"
+            master.vm.network "public_network", ip: "#{IP_BASE}#{i + 150}"
             master.vm.hostname = "k8s-m-#{i}"
             master.vm.provider "virtualbox" do |v|
                 v.memory = MASTERS_MEM
