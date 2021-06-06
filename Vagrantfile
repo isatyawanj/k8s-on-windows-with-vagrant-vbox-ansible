@@ -17,6 +17,9 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
     # below line is only needed if you want to push your own public key to all vms so that you can ssh into vm
     config.vm.provision "file", source: "d:/vagrant/sjangra.pub", destination: "~/.ssh/sjangra_authorized_keys"
+    config.vm.provision "shell", inline: <<-SHELL
+        cat "/home/vagrant/.ssh/sjangra_authorized_keys" >> "/home/vagrant/.ssh/authorized_keys"
+    SHELL
 
     (1..MASTERS_NUM).each do |i|
         config.vm.define "k8s-m-#{i}" do |master|
@@ -28,9 +31,6 @@ Vagrant.configure("2") do |config|
                 v.memory = MASTERS_MEM
                 v.cpus = MASTERS_CPU
             end
-            master.vm.provision "shell", inline: <<-SHELL
-                cat "~/.ssh/sjangra_authorized_keys" >> "~/.ssh/authorized_keys"
-            SHELL
             master.vm.provision "ansible_local" do |ansible|
                 ansible.playbook = "roles/k8s.yml"
                 #Redefine defaults
@@ -58,9 +58,6 @@ Vagrant.configure("2") do |config|
                 v.cpus = NODES_CPU
                 #v.customize ["modifyvm", :id, "--cpuexecutioncap", "20"]
             end
-            node.vm.provision "shell", inline: <<-SHELL
-                cat "~/.ssh/sjangra_authorized_keys" >> "~/.ssh/authorized_keys"
-            SHELL
             node.vm.provision "ansible_local" do |ansible|
                 ansible.playbook = "roles/k8s.yml"
                 #Redefine defaults
